@@ -3,8 +3,8 @@
 # This analysis uses data or information from the Harmonized Survey of Health, 
 # Ageing and Retirement in Europe dataset and Codebook, Version F as of February 
 # 2023 developed by the Gateway to Global Aging Data. The development of the 
-# Harmonized Survey of Health, Ageing and Retirement in Europe was funded by the National Institute on Aging (R01 AG030153, 
-# RC2 AG036619, 1R03AG043052). For more information, please refer to www.g2aging.org
+# Harmonized Survey of Health, Ageing and Retirement in Europe was funded by the National Institute on Aging 
+# (R01 AG030153, RC2 AG036619, 1R03AG043052). For more information, please refer to www.g2aging.org
 #########################
 
 Sys.setenv(LANG = "en")
