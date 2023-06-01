@@ -1,6 +1,4 @@
-# Thesis work - EDSD 2022
-# FUNCTIONS AND INFORMATION FOR THESIS
-# DFLE_50 SHARE 
+# This document contains functios neccessary to run the main analysis
 
 # life table simulation
 sim_lt <- function(eqx,eta,n){
