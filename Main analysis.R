@@ -421,7 +421,7 @@ head(women_ext)
 # both genders
 AUT <- rbind(men_ext, women_ext)
 # save it in "Results" folder
-write.csv(AUT, "directory_name")
+write.csv(AUT, "directory_name", row.names = FALSE)
 
 
 
