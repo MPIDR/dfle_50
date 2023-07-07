@@ -22,9 +22,9 @@ library(tictoc)
 # setwd("your_directory")
 
 # get necessary functions
-source('functions_P1.R')
+source('Functions.R')
 
-# If you followed by code in "Analytical_sample_prep.R", you should have a folder 
+# If you followed the code in "Analytical_sample_prep.R", you should have a folder 
 # "Data" with subdata files of individual countries.
 # Here I will provide an example using Austria.
 dat <- fread("Data/Austria.csv") 
