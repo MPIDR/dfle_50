@@ -64,6 +64,7 @@ dfle_plot <- ggplot(DFLE,aes(x = estimate, y = country, color=Education)) +
 
 dfle_plot
 
-# ggsave("directory_name")
+# choose the size of dpi according to the balance of the size and quality of resolution you want
+ggsave("directory_name", dpi = 300) 
 
 # you can replicate the plot for DLE or LE.
