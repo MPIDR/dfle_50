@@ -10,12 +10,152 @@
 Sys.setenv(LANG = "en")
 library(tidyverse)
 library(data.table)
+library(labelled)
 
 # Set working directory
 # setwd("your_directory")
 
-# Read the CSV file 
-# dt_full <- read.csv("g2ageing harmonized data file")
+# Read the Stata file 
+## This is the data file retrieved as per instructions at https://g2aging.org/?section=page&pageid=22
+mydt_wide <- read_dta("H_SHARE_e2.dta")
+
+# I create this for easier identification of column numbers for variables of interest
+col.names <- data.frame(colnames(mydt_wide))
+
+
+# save variables that are not time-varying
+constant_vars   <- (mydt_wide[,grep("[1,2,3,4,5,6,7,8]", names(mydt_wide),
+                       value=TRUE, invert=TRUE)])
+constant_vars <- constant_vars[,c(1,2,3,4,5,12,14,19)]
+
+# Age ---------------------------------------------------------------------
+# This function helps to identify which columns contain a character string of interest
+which(grepl("agey", col.names$colnames.mydt_wide.))
+
+# We retrieve those next to the unique merge ID 
+mydt_age <- mydt_wide[,c(3, 276:282)]
+
+# And convert sub-data from wide to long format
+mydt_age <- mydt_age %>%
+  pivot_longer(
+    cols = starts_with("r"),
+    names_to = "wave_v1",
+    names_prefix = "r",
+    values_to = "age",
+    values_drop_na = FALSE
+  ) %>%
+  mutate(wave = 
+           substr(wave_v1,1,1)) %>%
+  select(mergeid, wave, age)
+
+# Next, we add the converted sub-data to the constant variables 
+mydt_long <- merge(constant_vars, mydt_age, by="mergeid", all=TRUE)
+
+remove(constant_vars)  
+remove(mydt_age)
+
+table(mydt_long$wave, mydt_long$country)
+
+# Now we will repeat the same steps for all variables of interest
+
+# ADL ---------------------------------------------------------------------
+which(grepl("r1adla", col.names$colnames.mydt_wide.))
+
+mydt_adl <- mydt_wide[,c(3, 883:889)]
+
+
+mydt_adl <- mydt_adl %>%
+  pivot_longer(
+    cols = starts_with("r"),
+    names_to = "wave_v1",
+    names_prefix = "r",
+    values_to = "adl",
+    values_drop_na = FALSE
+  ) %>%
+  mutate(wave = 
+           substr(wave_v1,1,1)) %>%
+  select(mergeid, wave, adl)
+
+
+## merging with the rest
+mydt_long <- merge(mydt_long, mydt_adl, by=c("mergeid", "wave"), all=TRUE)
+
+## clearing from unnecessary sub-datasets
+remove(mydt_adl)
+table(mydt_long$wave, mydt_long$country)
+
+
+# GALI ---------------------------------------------------------------------
+which(grepl("hlthlma", col.names$colnames.mydt_wide.)) # whether health limits, categorical
+
+mydt_gali <- mydt_wide[,c(3, 481:487)]
+
+mydt_gali <- mydt_gali %>%
+  pivot_longer(
+    cols = starts_with("r"),
+    names_to = "wave_v1",
+    names_prefix = "r",
+    values_to = "hlthlma",
+    values_drop_na = FALSE
+  ) %>%
+  mutate(wave = 
+           substr(wave_v1,1,1)) %>%
+  select(mergeid, wave, hlthlma)
+
+mydt_long <- merge(mydt_long, mydt_gali, by=c("mergeid", "wave"), all=TRUE)
+
+remove(mydt_gali)
+table(mydt_long$wave, mydt_long$country)
+
+# Interview status -----------------------------------------------------
+which(grepl("iwstat", col.names$colnames.mydt_wide.))
+
+mydt_iwstat <- mydt_wide[,c(3, 92:99)]
+
+mydt_iwstat <- mydt_iwstat %>%
+  pivot_longer(
+    cols = starts_with("r"),
+    names_to = "wave_v1",
+    names_prefix = "r",
+    values_to = "iwstat",
+    values_drop_na = FALSE
+  ) %>%
+  mutate(wave = 
+           substr(wave_v1,1,1)) %>%
+  select(mergeid, wave, iwstat)
+
+mydt_long <- merge(mydt_long, mydt_iwstat, by=c("mergeid","wave"), all=TRUE)
+
+remove(mydt_iwstat)
+table(mydt_long$wave, mydt_long$country)
+
+
+# Person-level analysis weights -------------------------------------------
+which(grepl("wtresp", col.names$colnames.mydt_wide.))
+
+mydt_tresp <- mydt_wide [,c(3, 144:150)]
+
+mydt_tresp <- mydt_tresp %>%
+  pivot_longer(
+    cols = starts_with("r"),
+    names_to = "wave_v1",
+    names_prefix = "r",
+    values_to = "wtresp",
+    values_drop_na = FALSE
+  ) %>%
+  mutate(wave = 
+           substr(wave_v1,1,1)) %>%
+  select(mergeid, wave, wtresp)
+
+mydt_long <- merge(mydt_long, mydt_tresp, by=c("mergeid","wave"), all=TRUE)
+
+remove(mydt_tresp)
+table(mydt_long$wave, mydt_long$country)
+
+## Sorting
+dt_full <- mydt_long[order(mydt_long$mergeid, mydt_long$wave),]
+
+# Cosmetic work -------------------------------------------
 
 # Recode country codes to country names
 dt_full$country <- recode(
